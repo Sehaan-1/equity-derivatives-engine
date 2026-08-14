@@ -1,0 +1,197 @@
+# ==============================================================================
+# Git Ignore - Low-Latency C++ Execution Engine & Backtesting Framework
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# C / C++ Compiled Binaries & Build Outputs
+# ------------------------------------------------------------------------------
+bin/
+build/
+obj/
+out/
+dist/
+target/
+
+# Compiled Object & Library Files
+*.o
+*.obj
+*.lo
+*.la
+*.al
+*.a
+*.lib
+*.so
+*.so.*
+*.dylib
+*.dll
+
+# Compiled Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+trading_engine
+trading_engine.exe
+trading_engine_test.exe
+
+# Precompiled Headers & Intermediate Data
+*.gch
+*.pch
+*.d
+*.idb
+
+# Debug Symbols, Crash Dumps & Profiling
+*.dSYM/
+*.pdb
+*.ilk
+*.su
+core
+*.core
+vgcore.*
+gmon.out
+perf.data*
+*.gcda
+*.gcno
+*.gcov
+
+# ------------------------------------------------------------------------------
+# Build Systems (CMake, Ninja, Meson, Make)
+# ------------------------------------------------------------------------------
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+Testing/
+Makefile.in
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+CTestTestfile.cmake
+_deps/
+.ninja*
+.meson*
+
+# ------------------------------------------------------------------------------
+# Node.js & Web Dashboard
+# ------------------------------------------------------------------------------
+node_modules/
+*/node_modules/
+web/node_modules/
+.pnpm-store/
+
+# Logs & Debug Output
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Web Tooling & Framework Caches
+.eslintcache
+.stylelintcache
+.npm
+.node_repl_history
+
+# ------------------------------------------------------------------------------
+# Simulation, Market Data & Backtest Outputs
+# ------------------------------------------------------------------------------
+logs/
+*.log
+data/
+telemetry/
+reports/
+
+# Tick datasets, order history dumps and heavy metrics (unless fixture committed)
+*.csv
+*.parquet
+*.h5
+*.dat
+*.dump
+backtest_results*.json
+perf_results*.json
+latency_profile_*.json
+
+# Temporary sockets and locks
+*.sock
+*.lock
+!web/package-lock.json
+
+# ------------------------------------------------------------------------------
+# IDEs, Editors & Tooling
+# ------------------------------------------------------------------------------
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Visual Studio
+.vs/
+*.user
+*.userosv
+*.suo
+*.sln.docstates
+
+# JetBrains (CLion, WebStorm, etc.)
+.idea/
+cmake-build-*/
+*.iml
+*.iws
+
+# Xcode
+*.xcuserdatad/
+*.xcscmblueprint
+
+# Vim / Emacs / Sublime
+*~
+*.swp
+*.swo
+*.swn
+.#*
+#*#
+*#
+*.sublime-workspace
+*.sublime-project
+
+# ------------------------------------------------------------------------------
+# Operating System Artifacts
+# ------------------------------------------------------------------------------
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon\r\r
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+.fuse_hidden*
+
+# ------------------------------------------------------------------------------
+# AI Agents & Local Assistants Caches
+# ------------------------------------------------------------------------------
+.gemini/
+.claude/
+.copilot/
+scratch/
