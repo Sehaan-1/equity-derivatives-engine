@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Lock-Free Execution & Backtesting System | Indian Equity Derivatives</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            900: '#14532d',
+                        },
+                        darkbg: '#0b0f19',
+                        cardbg: '#111827',
+                        borderbg: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-darkbg text-gray-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Top Header Navigation -->
+    <header class="border-b border-borderbg bg-cardbg/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-brand-500/10 text-brand-500 rounded-lg border border-brand-500/20">
+                    <i data-lucide="cpu" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center space-x-2">
+                        <span>C++ Lock-Free Execution & Backtesting Engine</span>
+                        <span class="text-xs px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">C++20</span>
+                    </h1>
+                    <p class="text-xs text-gray-400">Indian Equity Derivatives (NSE Options & Futures) | Zerodha Kite Protocol</p>
+                </div>
+            </div>
+
+            <!-- Telemetry Badges -->
+            <div class="flex items-center space-x-4 text-sm">
+                <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-gray-800/80 border border-gray-700">
+                    <span class="relative flex h-2.5 w-2.5">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs font-mono text-gray-300">SPSC Queue: <strong class="text-emerald-400">measured per run</strong></span>
+                </div>
+
+                <div class="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-gray-800/80 border border-gray-700">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+                    <span class="text-xs font-mono text-gray-300">Risk Sample: <strong class="text-emerald-400">synthetic</strong></span>
+                </div>
+
+                <button id="run-unit-tests-btn" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 border border-gray-700 text-xs font-medium text-gray-200 transition flex items-center space-x-1.5">
+                    <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-blue-400"></i>
+                    <span>Run C++ Tests</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Tabs -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="border-b border-borderbg flex space-x-8">
+            <button class="nav-tab active border-b-2 border-brand-500 py-3 text-sm font-medium text-brand-500 flex items-center space-x-2" data-tab="tab-live">
+                <i data-lucide="activity" class="w-4 h-4"></i>
+                <span>Synthetic Telemetry & L2 Depth</span>
+            </button>
+            <button class="nav-tab border-b-2 border-transparent py-3 text-sm font-medium text-gray-400 hover:text-gray-200 flex items-center space-x-2" data-tab="tab-backtest">
+                <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+                <span>Event-Driven Backtester</span>
+            </button>
+            <button class="nav-tab border-b-2 border-transparent py-3 text-sm font-medium text-gray-400 hover:text-gray-200 flex items-center space-x-2" data-tab="tab-benchmark">
+                <i data-lucide="zap" class="w-4 h-4"></i>
+                <span>Lock-Free Microbenchmark</span>
+            </button>
+            <button class="nav-tab border-b-2 border-transparent py-3 text-sm font-medium text-gray-400 hover:text-gray-200 flex items-center space-x-2" data-tab="tab-architecture">
+                <i data-lucide="code" class="w-4 h-4"></i>
+                <span>Architecture & C++ Specs</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Containers -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+        <!-- TAB 1: SYNTHETIC TELEMETRY & L2 DEPTH -->
+        <div id="tab-live" class="tab-content space-y-6">
+            <!-- Key Metric Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="p-5 rounded-xl bg-cardbg border border-borderbg shadow-sm">
+                    <div class="flex justify-between items-center text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                        <span>NIFTY 26AUG FUT LTP</span>
+                        <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i>
+                    </div>
+                    <div class="mt-2 text-2xl font-extrabold font-mono text-white" id="live-ltp">₹ 24,500.00</div>
+                    <div class="mt-1 text-xs text-gray-400 font-mono">Spread: <span id="live-spread" class="text-gray-200">₹ 0.50</span></div>
+                </div>
+
+                <div class="p-5 rounded-xl bg-cardbg border border-borderbg shadow-sm">
+                    <div class="flex justify-between items-center text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                        <span>Order Book Imbalance</span>
+                        <i data-lucide="scale" class="w-4 h-4 text-blue-400"></i>
+                    </div>
+                    <div class="mt-2 text-2xl font-extrabold font-mono text-blue-400" id="live-imbalance">+0.142</div>
+                    <div class="mt-1 text-xs text-gray-400 font-mono">Micro-Price: <span id="live-microprice" class="text-gray-200">₹ 24,500.25</span></div>
+                </div>
+
+                <div class="p-5 rounded-xl bg-cardbg border border-borderbg shadow-sm">
+                    <div class="flex justify-between items-center text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                        <span>Simulated Risk Latency</span>
+                        <i data-lucide="clock" class="w-4 h-4 text-amber-400"></i>
+                    </div>
+                    <div class="mt-2 text-2xl font-extrabold font-mono text-amber-400" id="live-risk-latency">-- ns</div>
+                    <div class="mt-1 text-xs text-gray-400 font-mono">Synthetic WebSocket sample</div>
+                </div>
+
+                <div class="p-5 rounded-xl bg-cardbg border border-borderbg shadow-sm">
+                    <div class="flex justify-between items-center text-gray-400 text-xs font-semibold uppercase tracking-wider">
+                        <span>Risk Guardrails Status</span>
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-emerald-400"></i>
+                    </div>
+                    <div class="mt-2 flex items-center justify-between">
+                        <span class="px-2.5 py-1 text-xs font-bold rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30" id="kill-switch-status">ACTIVE</span>
+                        <button id="toggle-kill-switch" class="px-3 py-1 bg-red-600 hover:bg-red-700 text-white rounded text-xs font-semibold transition">
+                            Emergency Kill
+                        </button>
+                    </div>
+                    <div class="mt-1 text-xs text-gray-400 font-mono">Daily Drawdown: <span class="text-emerald-400">₹ 0.00 / -₹50,000</span></div>
+                </div>
+            </div>
+
+            <!-- L2 Order Depth Table & Order Book Spread -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Top 5 Bids & Asks Depth -->
+                <div class="lg:col-span-2 p-6 rounded-xl bg-cardbg border border-borderbg">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider mb-4 flex items-center justify-between">
+                        <span>L2 Order Depth (NIFTY 26AUG FUT)</span>
+                        <span class="text-xs text-gray-500 font-mono">5 Levels | Kite Binary Protocol</span>
+                    </h3>
+
+                    <div class="grid grid-cols-2 gap-4 font-mono text-xs">
+                        <!-- Bids Column -->
+                        <div class="space-y-1">
+                            <div class="grid grid-cols-3 text-gray-500 pb-2 border-b border-gray-800 font-sans font-medium">
+                                <span>Orders</span>
+                                <span class="text-right">Qty</span>
+                                <span class="text-right text-emerald-400">Bid (₹)</span>
+                            </div>
+                            <div id="bids-container" class="space-y-1">
+                                <!-- Dynamic Bids -->
+                            </div>
+                        </div>
+
+                        <!-- Asks Column -->
+                        <div class="space-y-1">
+                            <div class="grid grid-cols-3 text-gray-500 pb-2 border-b border-gray-800 font-sans font-medium">
+                                <span class="text-red-400">Ask (₹)</span>
+                                <span class="text-right">Qty</span>
+                                <span class="text-right">Orders</span>
+                            </div>
+                            <div id="asks-container" class="space-y-1">
+                                <!-- Dynamic Asks -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Controls & Live Stream Log -->
+                <div class="p-6 rounded-xl bg-cardbg border border-borderbg space-y-4">
+                    <h3 class="text-sm font-semibold text-gray-300 uppercase tracking-wider flex items-center space-x-2">
+                        <i data-lucide="terminal" class="w-4 h-4 text-emerald-400"></i>
+                        <span>Simulation Stream Log</span>
+                    </h3>
+                    <div id="live-terminal-log" class="bg-black/80 rounded-lg p-3 h-64 overflow-y-auto font-mono text-xs space-y-1 text-gray-300 border border-gray-800">
+                        <div class="text-gray-500">[SIM] Synthetic dashboard stream initialized...</div>
+                        <div class="text-emerald-400">[OMS] Order Pool pre-allocated (4096 slots)</div>
+                        <div class="text-blue-400">[RISK] Pre-trade checks armed: Max Qty=1800, Rate=100/s</div>
+                    </div>
+
+                    <button id="trigger-live-c-run" class="w-full py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-xs rounded-lg transition flex items-center justify-center space-x-2">
+                        <i data-lucide="play" class="w-4 h-4"></i>
+                        <span>Run C++ Multi-Threaded Simulation</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: EVENT-DRIVEN BACKTESTER -->
+        <div id="tab-backtest" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <!-- Backtest Controls Sidebar -->
+                <div class="p-6 rounded-xl bg-cardbg border border-borderbg space-y-5">
+                    <h3 class="text-sm font-semibold text-gray-200 uppercase tracking-wider flex items-center space-x-2">
+                        <i data-lucide="sliders" class="w-4 h-4 text-brand-500"></i>
+                        <span>Backtest Parameters</span>
+                    </h3>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 font-medium mb-1">Select Strategy</label>
+                        <select id="bt-strategy" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm text-gray-200 focus:outline-none focus:border-brand-500">
+                            <option value="vwap">VWAP Mean Reversion & Imbalance Scalper</option>
+                            <option value="delta_neutral">Delta-Neutral Gamma Scalper (NIFTY Options)</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 font-medium mb-1">Initial Capital (₹)</label>
+                        <input type="number" id="bt-capital" value="1000000" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono text-gray-200 focus:outline-none focus:border-brand-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs text-gray-400 font-medium mb-1">Slippage (Basis Points)</label>
+                        <input type="number" id="bt-slippage" value="0.5" step="0.1" class="w-full bg-gray-900 border border-gray-700 rounded-lg px-3 py-2 text-sm font-mono text-gray-200 focus:outline-none focus:border-brand-500">
+                    </div>
+
+                    <button id="run-backtest-btn" class="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm rounded-lg shadow-lg shadow-brand-500/20 transition flex items-center justify-center space-x-2">
+                        <i data-lucide="play-circle" class="w-4 h-4"></i>
+                        <span>Run C++ Backtest</span>
+                    </button>
+                </div>
+
+                <!-- Backtest Results Display -->
+                <div class="lg:col-span-3 space-y-6">
+                    <!-- Metrics Overview Cards -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                        <div class="p-4 rounded-xl bg-cardbg border border-borderbg">
+                            <div class="text-xs text-gray-400">Net PnL</div>
+                            <div class="text-xl font-extrabold font-mono mt-1 text-white" id="res-net-pnl">₹ 0.00</div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-cardbg border border-borderbg">
+                            <div class="text-xs text-gray-400">Sharpe Ratio</div>
+                            <div class="text-xl font-extrabold font-mono mt-1 text-blue-400" id="res-sharpe">0.00</div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-cardbg border border-borderbg">
+                            <div class="text-xs text-gray-400">Max Drawdown</div>
+                            <div class="text-xl font-extrabold font-mono mt-1 text-red-400" id="res-drawdown">0.00%</div>
+                        </div>
+                        <div class="p-4 rounded-xl bg-cardbg border border-borderbg">
+                            <div class="text-xs text-gray-400">Win Rate</div>
+                            <div class="text-xl font-extrabold font-mono mt-1 text-emerald-400" id="res-win-rate">0.00%</div>
+                        </div>
+                    </div>
+
+                    <!-- Equity Curve Chart -->
+                    <div class="p-6 rounded-xl bg-cardbg border border-borderbg">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Mark-To-Market Equity Curve (Tick-by-Tick)</h4>
+                        <div class="h-64">
+                            <canvas id="equity-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Indian Statutory Tax & Charge Breakdown -->
+                    <div class="p-6 rounded-xl bg-cardbg border border-borderbg">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 flex items-center justify-between">
+                            <span>Indian Market Transaction Costs Breakdown (NSE / Zerodha)</span>
+                            <span class="text-xs font-mono text-amber-400" id="res-total-taxes">Total Charges: ₹ 0.00</span>
+                        </h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-6 gap-3 text-xs font-mono">
+                            <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                <div class="text-gray-500">Brokerage</div>
+                                <div class="font-bold text-gray-200 mt-1" id="tax-brokerage">₹ 0.00</div>
+                            </div>
+                            <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                <div class="text-gray-500">STT</div>
+                                <div class="font-bold text-gray-200 mt-1" id="tax-stt">₹ 0.00</div>
+                            </div>
+                            <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                <div class="text-gray-500">Exchange Fee</div>
+                                <div class="font-bold text-gray-200 mt-1" id="tax-exchange">₹ 0.00</div>
+                            </div>
+                            <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                <div class="text-gray-500">SEBI Fee</div>
+                                <div class="font-bold text-gray-200 mt-1" id="tax-sebi">₹ 0.00</div>
+                            </div>
+                            <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                <div class="text-gray-500">Stamp Duty</div>
+                                <div class="font-bold text-gray-200 mt-1" id="tax-stamp">₹ 0.00</div>
+                            </div>
+                            <div class="p-3 bg-gray-900 rounded-lg border border-gray-800">
+                                <div class="text-gray-500">18% GST</div>
+                                <div class="font-bold text-gray-200 mt-1" id="tax-gst">₹ 0.00</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: LOCK-FREE MICROBENCHMARK -->
+        <div id="tab-benchmark" class="tab-content hidden space-y-6">
+            <div class="p-6 rounded-xl bg-cardbg border border-borderbg space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h3 class="text-base font-bold text-white">Lock-Free SPSC Queue vs std::mutex Queue Microbenchmark</h3>
+                        <p class="text-xs text-gray-400 mt-0.5">Executes 5,000,000 atomic transfers across thread boundaries in compiled C++20.</p>
+                    </div>
+                    <button id="run-benchmark-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-lg transition flex items-center space-x-2">
+                        <i data-lucide="zap" class="w-4 h-4"></i>
+                        <span>Execute 5M Message Benchmark</span>
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Throughput Comparison Chart -->
+                    <div class="p-4 bg-gray-900 rounded-lg border border-gray-800">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Throughput (Million Ops / Sec)</h4>
+                        <div class="h-56">
+                            <canvas id="benchmark-mops-chart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Latency Comparison Chart -->
+                    <div class="p-4 bg-gray-900 rounded-lg border border-gray-800">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3">Average Latency (Nanoseconds)</h4>
+                        <div class="h-56">
+                            <canvas id="benchmark-latency-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Raw stdout output block -->
+                <div class="p-4 bg-black/80 rounded-lg border border-gray-800">
+                    <div class="text-xs font-semibold text-gray-400 mb-2 font-mono">C++ Binary Benchmark Raw Output</div>
+                    <pre id="benchmark-raw-out" class="font-mono text-xs text-emerald-400 overflow-x-auto">Click "Execute 5M Message Benchmark" to run live microbenchmark in C++ engine...</pre>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: ARCHITECTURE & SPECS -->
+        <div id="tab-architecture" class="tab-content hidden space-y-6">
+            <div class="p-6 rounded-xl bg-cardbg border border-borderbg space-y-6">
+                <h3 class="text-lg font-bold text-white">System Architecture & Low-Latency C++ Specifications</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs text-gray-300">
+                    <div class="p-4 bg-gray-900 rounded-lg border border-gray-800 space-y-2">
+                        <div class="font-bold text-brand-500 flex items-center space-x-1.5 text-sm">
+                            <i data-lucide="layers" class="w-4 h-4"></i>
+                            <span>Lock-Free SPSC & MPSC Ring Buffer</span>
+                        </div>
+                        <p class="leading-relaxed text-gray-400">
+                            Uses atomic memory orderings (<code class="text-emerald-400">acquire/release</code>) without mutex locks or system calls. Head and tail pointers are aligned to separate 64-byte cache lines (<code class="text-emerald-400">alignas(64)</code>) to prevent CPU L1/L2 cache line bouncing and false sharing.
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-gray-900 rounded-lg border border-gray-800 space-y-2">
+                        <div class="font-bold text-blue-400 flex items-center space-x-1.5 text-sm">
+                            <i data-lucide="shield" class="w-4 h-4"></i>
+                            <span>Pre-Trade Risk Engine</span>
+                        </div>
+                        <p class="leading-relaxed text-gray-400">
+                            Evaluates pre-trade safety controls inline and reports measured latency from each compiled simulator run. Features fat-finger order quantity limits, price collar percentage checks, order rate limiters, and daily drawdown circuit breaker.
+                        </p>
+                    </div>
+
+                    <div class="p-4 bg-gray-900 rounded-lg border border-gray-800 space-y-2">
+                        <div class="font-bold text-amber-400 flex items-center space-x-1.5 text-sm">
+                            <i data-lucide="database" class="w-4 h-4"></i>
+                            <span>Zero-Allocation Object Pool</span>
+                        </div>
+                        <p class="leading-relaxed text-gray-400">
+                            Pre-allocates queue storage and OMS pools for <code class="text-emerald-400">Tick</code>, <code class="text-emerald-400">OrderRequest</code>, <code class="text-emerald-400">ActiveOrder</code>, and <code class="text-emerald-400">ExecutionReport</code> at engine boot for bounded hot-path memory use.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-gray-900 rounded-lg border border-gray-800">
+                    <h4 class="text-sm font-bold text-gray-200 mb-2">Zerodha Kite Binary Frame Parser Spec (184 Bytes Full Mode)</h4>
+                    <p class="text-xs text-gray-400 leading-relaxed font-mono">
+                        Header (2B) | Token (4B) | LTP (4B) | LTQ (4B) | Volume (4B) | Open/High/Low/Close (16B) | OI (4B) | L2 Depth (120B: 5 Bids x 12B + 5 Asks x 12B)
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

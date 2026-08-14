@@ -1,0 +1,10 @@
+.nav-tab {
+    transition: all 0.2s ease-in-out;
+}
+.nav-tab:hover {
+    color: #f3f4f6;
+}
+.nav-tab.active {
+    color: #22c55e;
+    border-bottom-color: #22c55e;
+}
